@@ -1,0 +1,12 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+video {
+  transform: rotateY(180deg);
+}
+
+canvas {
+  display: none;
+}
