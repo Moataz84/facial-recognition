@@ -1,9 +1,8 @@
 from face_recognition import load_image_file, face_encodings, compare_faces
-from os import getcwd, listdir, remove, makedirs
+from os import getcwd, listdir, makedirs
 from os.path import basename, splitext, dirname, exists
 from urllib.request import urlopen
 from uuid import uuid4
-from PIL import Image
 import json
 
 def saveImage(dataURI):
@@ -12,17 +11,10 @@ def saveImage(dataURI):
     makedirs(dir)
 
   file_path = f"tmp/{uuid4()}.jpg"
-  output_file = f"tmp/{uuid4()}.jpg"
   response = urlopen(dataURI)
   with open(file_path, "wb") as file:
     file.write(response.file.read())
-
-  original_image = Image.open(file_path)
-  mirrored_image = original_image.transpose(Image.FLIP_LEFT_RIGHT)
-  mirrored_image.save(output_file)
-  remove(file_path)
-  return output_file
-  
+  return file_path
 
 def findSimilar(image_path):
   index = 0

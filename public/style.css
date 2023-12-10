@@ -3,10 +3,24 @@
   padding: 0;
 }
 
-video {
+input {
+  display: block;
+  margin: 0 auto;
+}
+
+input.non-mobile {
+  display: none;
+}
+
+video.non-mobile {
   transform: rotateY(180deg);
 }
 
 canvas {
   display: none;
+}
+
+button {
+  display: block;
+  margin-top: 20px;
 }
