@@ -14,13 +14,12 @@ navigator.mediaDevices.getUserMedia({
   audio: false, 
   video: {
     facingMode: {
-      exact: isMobile? "environment" : "user",
+      ideal: isMobile? "environment" : "user",
       zoom: true
     }
   }
 }).then(stream => {
   const videoTracks = stream.getVideoTracks()
-  console.log(videoTracks[0].getSettings())
   zoom(videoTracks)
   video.srcObject = stream
   video.addEventListener("loadedmetadata", () => button.addEventListener("click", sendData))
