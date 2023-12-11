@@ -12,8 +12,13 @@ input.non-mobile {
   display: none;
 }
 
+video {
+  max-height: 70vh;
+}
+
 video.non-mobile {
   transform: rotateY(180deg);
+  max-width: 500px;
 }
 
 canvas {

@@ -3,7 +3,7 @@ const canvas = document.querySelector("canvas")
 const input = document.querySelector("input")
 const button = document.querySelector("button")
 
-const isMobile = navigator.userAgentData.mobile
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
 if (!isMobile) {
   video.classList.add("non-mobile")
@@ -20,6 +20,7 @@ navigator.mediaDevices.getUserMedia({
   }
 }).then(stream => {
   const videoTracks = stream.getVideoTracks()
+  console.log(videoTracks[0].getSettings())
   zoom(videoTracks)
   video.srcObject = stream
   video.addEventListener("loadedmetadata", () => button.addEventListener("click", sendData))
