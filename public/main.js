@@ -6,7 +6,7 @@ const switchBtn = document.querySelector(".switch")
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 let mode = isMobile? "environment" : "user"
-let videoTracks
+let numberOfDevices, videoTracks
 
 if (mode === "user") video.classList.add("inverted")
 
@@ -18,11 +18,17 @@ navigator.mediaDevices.getUserMedia({
       zoom: true
     }
   }
-}).then(stream => {
+}).then(async stream => {
+  const devices = await navigator.mediaDevices.enumerateDevices()
+  numberOfDevices = devices.filter(device => device.kind === "videoinput").length
+
   videoTracks = stream.getVideoTracks()
   zoom(videoTracks)
   video.srcObject = stream
+
   video.addEventListener("loadedmetadata", () => {
+    if (numberOfDevices >= 2) switchBtn.classList.remove("hidden")
+    submit.classList.remove("hidden")
     submit.addEventListener("click", sendData)
     switchBtn.addEventListener("click", switchMode)
     input.addEventListener("input", e => zoom(videoTracks, parseInt(e.target.value)))
@@ -40,6 +46,7 @@ function zoom(videoTracks, factor = 1) {
 }
 
 async function switchMode() {
+  if (numberOfDevices < 2) return
   submit.disabled = switchBtn.disabled = true
   videoTracks.forEach(track => track.stop())
   const newMode = mode === "environment"? "user" : "environment"

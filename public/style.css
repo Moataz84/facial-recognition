@@ -30,6 +30,6 @@ canvas {
   cursor: pointer;
 }
 
-.controls input.hidden {
+.hidden {
   display: none;
 }
