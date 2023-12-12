@@ -6,9 +6,9 @@ const switchBtn = document.querySelector(".switch")
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 let mode = isMobile? "environment" : "user"
-if (mode === "user") video.classList.add("inverted")
+let videoTracks
 
-if (!isMobile) video.classList.add("non-mobile")
+if (mode === "user") video.classList.add("inverted")
 
 navigator.mediaDevices.getUserMedia({
   audio: false, 
@@ -19,7 +19,7 @@ navigator.mediaDevices.getUserMedia({
     }
   }
 }).then(stream => {
-  const videoTracks = stream.getVideoTracks()
+  videoTracks = stream.getVideoTracks()
   zoom(videoTracks)
   video.srcObject = stream
   video.addEventListener("loadedmetadata", () => {
@@ -30,9 +30,9 @@ navigator.mediaDevices.getUserMedia({
   })
 })
 
-function zoom(videoTracks, factor = 2) {
+function zoom(videoTracks, factor = 1) {
   const settings = videoTracks[0].getSettings()
-  if (!settings.zoom) return
+  if (!settings.zoom || mode === "user") return
   input.classList.remove("hidden")
   videoTracks[0].applyConstraints({
     advanced: [{zoom: factor}]
@@ -41,10 +41,16 @@ function zoom(videoTracks, factor = 2) {
 
 async function switchMode() {
   submit.disabled = switchBtn.disabled = true
+  videoTracks.forEach(track => track.stop())
   const newMode = mode === "environment"? "user" : "environment"
-  video.classList.remove("inverted")
-  if (newMode === "user") video.classList.add("inverted")
   mode = newMode
+
+  video.classList.remove("inverted")
+  if (newMode === "user") {
+    video.classList.add("inverted")
+    input.classList.add("hidden")
+  }
+  
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false, 
     video: {
@@ -54,7 +60,7 @@ async function switchMode() {
       }
     }
   })
-  const videoTracks = stream.getVideoTracks()
+  videoTracks = stream.getVideoTracks()
   zoom(videoTracks)
   video.srcObject = stream
   submit.disabled = switchBtn.disabled = false
