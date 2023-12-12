@@ -1,15 +1,14 @@
 const video = document.querySelector("video")
 const canvas = document.querySelector("canvas")
 const input = document.querySelector("input")
-const button = document.querySelector(".submit")
+const submit = document.querySelector(".submit")
+const switchBtn = document.querySelector(".switch")
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 let mode = isMobile? "environment" : "user"
+if (mode === "user") video.classList.add("inverted")
 
-if (!isMobile) {
-  video.classList.add("non-mobile")
-  input.classList.add("non-mobile")
-}
+if (!isMobile) video.classList.add("non-mobile")
 
 navigator.mediaDevices.getUserMedia({
   audio: false, 
@@ -24,8 +23,8 @@ navigator.mediaDevices.getUserMedia({
   zoom(videoTracks)
   video.srcObject = stream
   video.addEventListener("loadedmetadata", () => {
-    button.addEventListener("click", sendData)
-    document.querySelector(".switch").addEventListener("click", switchMode)
+    submit.addEventListener("click", sendData)
+    switchBtn.addEventListener("click", switchMode)
     input.addEventListener("input", e => zoom(videoTracks, parseInt(e.target.value)))
     input.addEventListener("change", e => zoom(videoTracks, parseInt(e.target.value)))
   })
@@ -34,15 +33,19 @@ navigator.mediaDevices.getUserMedia({
 function zoom(videoTracks, factor = 2) {
   const settings = videoTracks[0].getSettings()
   if (!settings.zoom) return
+  input.classList.remove("hidden")
   videoTracks[0].applyConstraints({
     advanced: [{zoom: factor}]
   })
 }
 
 async function switchMode() {
+  submit.disabled = switchBtn.disabled = true
   const newMode = mode === "environment"? "user" : "environment"
+  video.classList.remove("inverted")
+  if (newMode === "user") video.classList.add("inverted")
   mode = newMode
-  navigator.mediaDevices.getUserMedia({
+  const stream = await navigator.mediaDevices.getUserMedia({
     audio: false, 
     video: {
       facingMode: {
@@ -50,15 +53,11 @@ async function switchMode() {
         zoom: true
       }
     }
-  }).then(stream => {
-    const videoTracks = stream.getVideoTracks()
-    zoom(videoTracks)
-    video.srcObject = stream
-    video.addEventListener("loadedmetadata", () => {
-      input.addEventListener("input", e => zoom(videoTracks, parseInt(e.target.value)))
-      input.addEventListener("change", e => zoom(videoTracks, parseInt(e.target.value)))
-    })
   })
+  const videoTracks = stream.getVideoTracks()
+  zoom(videoTracks)
+  video.srcObject = stream
+  submit.disabled = switchBtn.disabled = false
 }
 
 async function sendData() {
@@ -67,7 +66,7 @@ async function sendData() {
   canvas.width = video.videoWidth
   canvas.height = video.videoHeight
   canvas.getContext("2d").drawImage(video, 0, 0, video.videoWidth, video.videoHeight)
-  button.disabled = true
+  submit.disabled = switchBtn.disabled = true
 
   const dataUri = canvas.toDataURL("image/jpeg", 0.9)
   const res = await fetch("/api/send-image", {
@@ -79,5 +78,5 @@ async function sendData() {
   })
   const { name } = await res.json()
   msg.innerText = name
-  button.disabled = false
+  submit.disabled = switchBtn.disabled = false
 }

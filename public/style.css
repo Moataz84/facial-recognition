@@ -3,12 +3,18 @@
   padding: 0;
 }
 
-input {
-  display: block;
-  margin: 0 auto;
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-input.non-mobile {
+.controls input {
+  cursor: pointer;
+}
+
+.controls input.hidden {
   display: none;
 }
 
@@ -16,16 +22,14 @@ video {
   max-height: 70vh;
 }
 
-video.non-mobile {
+video.inverted {
   transform: rotateY(180deg);
+}
+
+video.non-mobile {
   max-width: 500px;
 }
 
 canvas {
   display: none;
-}
-
-button {
-  display: block;
-  margin-top: 20px;
 }
